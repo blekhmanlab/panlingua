@@ -59,28 +59,30 @@ def search():
     """
     query = bottle.request.forms.get('q')
     lang = bottle.request.forms.get('lang')
-    recaptcha = bottle.request.forms.get('recaptcha_response')
 
     # validate the recaptcha
-    body = {
-        'secret': config.recaptcha_private,
-        'response': recaptcha,
-        'remoteip': bottle.request.remote_addr # TODO: is this reliable?
-    }
-    resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=body)
-    if resp.status_code != 200:
-        raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (error returned from Google).")
-    try:
-        validate = resp.json()
-    except:
-        raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (unable to decode Google response).")
-    if 'success' not in validate.keys() or not validate['success']:
-        print(validate['error-codes'])
-        raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request.")
+    if config.recaptcha_private is not None:
+        recaptcha = bottle.request.forms.get('recaptcha_response')
+        body = {
+            'secret': config.recaptcha_private,
+            'response': recaptcha,
+            'remoteip': bottle.request.remote_addr # TODO: is this reliable?
+        }
+        resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=body)
+        if resp.status_code != 200:
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (error returned from Google).")
+        try:
+            validate = resp.json()
+        except:
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (unable to decode Google response).")
+        if 'success' not in validate.keys():
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request.")
+        if not validate['success']:
+            raise bottle.HTTPError(status=400, body="Request flagged as suspicious, sorry.")
 
     if lang is None or query is None:
         raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.")
-        # It's tempting to translate errors into the language specified by the
+        # NOTE: It's tempting to translate errors into the language specified by the
         # user, but that could allow a malicious user to trick us into sending
         # lots of calls to Google without bothering to form a legitimate query
     if lang not in LANGUAGES.keys():
