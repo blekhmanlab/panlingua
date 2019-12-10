@@ -64,7 +64,7 @@
           <h4>A multilingual preprint search tool</h2>
         </div>
         <div class="col-md-6">
-          <p>PanLingua allows you to <strong>search for bioRxiv preprints in your own language</strong>, using Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, <a href="https://github.com/rabdill/panlingua">code</a> by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
+          <p>PanLingua allows you to <strong>search for bioRxiv preprints in your own language</strong>, using Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
       </div>
       <div class="row">
@@ -74,7 +74,10 @@
           </div>
         % end
       </div>
-      <form action="/" method="post" onsubmit="return get_recaptcha()">
+      <div id="jsWarning">
+        <strong>JavaScript is required for this page to function properly.</strong>
+      </div>
+      <form action="/" id="searchform" method="post" onsubmit="return get_recaptcha()" style="display:none">
         <div class="form-row align-items-center">
           <div class="col-auto">
               <label class="sr-only" for="q">Search term</label>
@@ -105,7 +108,7 @@
       </form>
       <div class="row">
         <div class="col-sm-12" style="text-align: right;">
-          <a href="#" onclick="toggle_privacy();">Privacy</a>
+          <a href="https://github.com/rabdill/panlingua">Source code</a> | <a href="#" onclick="toggle_privacy();">Privacy</a>
         </div>
       </div>
       <div class="row" id="fineprint" style="display:none">
@@ -133,5 +136,11 @@
         </div>
       </div>
     </div>
+
+    <script>
+      // Make sure users have JS working so we can use reCAPTCHA
+      document.getElementById('jsWarning').style.display = "none";
+      document.getElementById('searchform').style.display = "block";
+    </script>
   </body>
 </html>
