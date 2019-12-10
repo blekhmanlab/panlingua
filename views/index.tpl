@@ -14,15 +14,24 @@
         </script>
       % end
 
-      <script src="//www.google.com/recaptcha/api.js?render={{config['recaptcha_public']}}"></script>
+      % if config['recaptcha_public'] is not None:
+        <script src="//www.google.com/recaptcha/api.js?render={{config['recaptcha_public']}}"></script>
+        <script>
+          get_recaptcha = function() {
+            grecaptcha.execute('{{config['recaptcha_public']}}', {action: 'homepage'}).then(function(token) {
+              var recaptchaResponse = document.getElementById('recaptchaResponse');
+              recaptchaResponse.value = token;
+            });
+          }
+          //grecaptcha.ready();
+        </script>
+      % end
       <script>
-        get_recaptcha = function() {
-          grecaptcha.execute('{{config['recaptcha_public']}}', {action: 'homepage'}).then(function(token) {
-            var recaptchaResponse = document.getElementById('recaptchaResponse');
-            recaptchaResponse.value = token;
-          });
+        toggle_privacy = function() {
+          var fineprint = document.getElementById('fineprint');
+          if(fineprint.style.display == "none") fineprint.style.display = "block";
+          else fineprint.style.display = "none";
         }
-        //grecaptcha.ready();
       </script>
 
       <link rel="stylesheet" href="/static/bootstrap.min.css">
@@ -40,7 +49,9 @@
           padding-top: 20px;
           margin-top: 10%;
         }
-
+        a:hover {
+          text-decoration: none;
+        }
       </style>
 
     <title>PanLingua</title>
@@ -67,7 +78,7 @@
         <div class="form-row align-items-center">
           <div class="col-auto">
               <label class="sr-only" for="q">Search term</label>
-              <input type="text" class="form-control form-control-lg" id="q" name="q" maxlength="100" placeholder="Enter a search term here" value="{{q}}">
+              <input type="text" class="form-control form-control-lg" id="q" name="q" maxlength="100" placeholder="Enter a search term here" value="{{q}}" autofocus>
           </div>
           <div class="col-auto">
             <label class="sr-only" for="lang">Language</label>
@@ -87,12 +98,40 @@
           </div>
         </div>
         <div class="form-row align-items-center">
-            <div class="col-sm-1">
-          <div class="col-sm-3">
+          <div class="col-sm-3 offset-sm-1">
             <a href="https://translate.google.com" target="_blank"><img src="/static/google_translate.png" style="width: 200px;"></a>
           </div>
         </div>
       </form>
+      <div class="row">
+        <div class="col-sm-12" style="text-align: right;">
+          <a href="#" onclick="toggle_privacy();">Privacy</a>
+        </div>
+      </div>
+      <div class="row" id="fineprint" style="display:none">
+        <div class="col-sm-8">
+          <h2>Privacy</h2>
+          <p>We do not store the contents of any query.
+          % if config['recaptcha_public'] is not None:
+            PanLingua uses Google's reCAPTCHA v3 service to fight spam and abuse of the service.
+          % end
+          % if config['google_analytics_tag'] is not None:
+            It
+            % if config['recaptcha_public'] is not None:
+              also
+            % end
+            uses Google Analytics (with all advertising features disabled) to better understand how visitors use our site.
+          % end
+          % if config['google_analytics_tag'] is not None or config['recaptcha_public'] is not None:
+            % if config['google_analytics_tag'] is not None and config['recaptcha_public'] is not None:
+              In both cases, the
+            % else:
+              The
+            % end
+            Google <a href="https://policies.google.com/privacy">privacy policy</a> and <a href="https://policies.google.com/terms">terms of service</a> apply.
+          % end
+        </div>
+      </div>
     </div>
   </body>
 </html>
