@@ -3,20 +3,28 @@
   <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      % if google_tag is not None:
+      % if config['google_analytics_tag'] is not None:
         <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{config.google_analytics_tag}}"></script>
+        <script async src="//www.googletagmanager.com/gtag/js?id={{config['google_analytics_tag']}}"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-
-          gtag('config', '{{config.google_analytics_tag}}');
+          gtag('config', '{{config['google_analytics_tag']}}');
         </script>
       % end
 
-      <link rel="stylesheet" href="/static/bootstrap.min.css">
+      <script src="//www.google.com/recaptcha/api.js?render={{config['recaptcha_public']}}"></script>
+      <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{config['recaptcha_public']}}', {action: 'homepage'}).then(function(token) {
+              var recaptchaResponse = document.getElementById('recaptchaResponse');
+              recaptchaResponse.value = token;
+            });
+        });
+      </script>
 
+      <link rel="stylesheet" href="/static/bootstrap.min.css">
       <style>
         body {
           background-color: #a1a1a1;
@@ -44,7 +52,7 @@
           <h4>A multilingual preprint search tool</h2>
         </div>
         <div class="col-md-6">
-          <p>PanLingua allows you to <strong>search for bioRxiv preprints in your own language</strong>, using Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
+          <p>PanLingua allows you to <strong>search for bioRxiv preprints in your own language</strong>, using Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, <a href="https://github.com/rabdill/panlingua">code</a> by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
       </div>
       <div class="row">
@@ -54,7 +62,7 @@
           </div>
         % end
       </div>
-      <form action="/" method="get">
+      <form action="/" method="post">
         <div class="form-row align-items-center">
           <div class="col-auto">
               <label class="sr-only" for="q">Search term</label>
@@ -72,6 +80,7 @@
               % end
             </select>
           </div>
+          <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
           <div class="col-auto">
             <button type="submit" class="btn btn-lg" style="background-color:red"><strong>Search</strong></button>
           </div>
@@ -83,11 +92,6 @@
           </div>
         </div>
       </form>
-    </div>
-    <div class="row">
-      <div class="col-sm-12">
-        <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a> <em>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</em>
-      </div>
     </div>
   </body>
 </html>

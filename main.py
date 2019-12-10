@@ -4,7 +4,6 @@ On startup, the application fetches a list of currently supported
 languages from the Google Cloud Translate API.
 """
 
-# docker run -it --rm --name panlingua -p 8120:80 -v "$(pwd)":/app --env GOOGLE_APPLICATION_CREDENTIALS="/app/google_cloud_credentials.json" python:slim bash
 import sys
 import bottle
 from google.cloud import translate_v2 as translate
@@ -37,11 +36,16 @@ def index():
     - lang: An "alpha-2" abbreviation (ISO 3166) of the source language
         selected by the user
     """
-    query = bottle.request.query.q
-    lang = bottle.request.query.lang
+    query = bottle.request.forms.get('q')
+    lang = bottle.request.forms.get('lang')
+    recaptcha = bottle.request.forms.get('recaptcha_response')
+    print(f'|{recaptcha}|')
+    print('---')
     error = (None, None)
     if lang == "": # default to spanish
         lang = "es"
+    if query is None:
+        return bottle.template('index', lang=lang, q=query, languages=LANGUAGES, error=None, config=config.to_display)
     if len(query) > 100:
         raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.")
         # It's tempting to translate errors into the language specified by the
@@ -49,20 +53,18 @@ def index():
         # lots of calls to Google without bothering to form a legitimate query
     if lang not in LANGUAGES.keys():
         raise bottle.HTTPError(status=400, body="Unrecognized language specified")
-    if len(query) > 0:
-        resp = GOOGLE.translate(query, source_language=lang)
-        return bottle.redirect(f"https://translate.google.com/translate?sl=en&tl={lang}&u=https%3A%2F%2Fwww.biorxiv.org%2Fsearch%2F{resp['translatedText']}", 303)
-    return bottle.template('index', lang=lang, q=query, languages=LANGUAGES, error=None, config=config)
+
+    resp = GOOGLE.translate(query, source_language=lang)
+    return bottle.redirect(f"https://translate.google.com/translate?sl=en&tl={lang}&u=https%3A%2F%2Fwww.biorxiv.org%2Fsearch%2F{resp['translatedText']}", 303)
 
 @bottle.error(400)
 def error400(error):
-    return bottle.template('index', lang="es", q="", languages=LANGUAGES, error=error.body)
+    return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
 @bottle.error(404)
 def error404(error):
-    return bottle.template('index', lang="es", q="", languages=LANGUAGES, error=error.body)
+    return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
 
 # Search engine stuff
-@bottle.route(f'/{config.google_validation_file}')
 @bottle.route('/robots.txt')
 def robots():
     return bottle.static_file(filename='robots.txt', root='./static/')
