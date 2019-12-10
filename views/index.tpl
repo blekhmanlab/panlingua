@@ -16,12 +16,13 @@
 
       <script src="//www.google.com/recaptcha/api.js?render={{config['recaptcha_public']}}"></script>
       <script>
-        grecaptcha.ready(function() {
-            grecaptcha.execute('{{config['recaptcha_public']}}', {action: 'homepage'}).then(function(token) {
-              var recaptchaResponse = document.getElementById('recaptchaResponse');
-              recaptchaResponse.value = token;
-            });
-        });
+        get_recaptcha = function() {
+          grecaptcha.execute('{{config['recaptcha_public']}}', {action: 'homepage'}).then(function(token) {
+            var recaptchaResponse = document.getElementById('recaptchaResponse');
+            recaptchaResponse.value = token;
+          });
+        }
+        //grecaptcha.ready();
       </script>
 
       <link rel="stylesheet" href="/static/bootstrap.min.css">
@@ -62,7 +63,7 @@
           </div>
         % end
       </div>
-      <form action="/" method="post">
+      <form action="/" method="post" onsubmit="return get_recaptcha()">
         <div class="form-row align-items-center">
           <div class="col-auto">
               <label class="sr-only" for="q">Search term</label>

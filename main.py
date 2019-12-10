@@ -3,10 +3,11 @@
 On startup, the application fetches a list of currently supported
 languages from the Google Cloud Translate API.
 """
-
+import json
 import sys
 import bottle
 from google.cloud import translate_v2 as translate
+import requests
 import config
 
 # phone google to get a list of available languages
@@ -59,8 +60,24 @@ def search():
     query = bottle.request.forms.get('q')
     lang = bottle.request.forms.get('lang')
     recaptcha = bottle.request.forms.get('recaptcha_response')
-    print(f'|{recaptcha}|')
-    print('---')
+
+    # validate the recaptcha
+    body = {
+        'secret': config.recaptcha_private,
+        'response': recaptcha,
+        'remoteip': bottle.request.remote_addr # TODO: is this reliable?
+    }
+    resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=body)
+    if resp.status_code != 200:
+        raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (error returned from Google).")
+    try:
+        validate = resp.json()
+    except:
+        raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (unable to decode Google response).")
+    if 'success' not in validate.keys() or not validate['success']:
+        print(validate['error-codes'])
+        raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request.")
+
     if lang is None or query is None:
         raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.")
         # It's tempting to translate errors into the language specified by the
