@@ -64,7 +64,8 @@
           <h4>A multilingual preprint search tool</h2>
         </div>
         <div class="col-md-6">
-          <p>PanLingua allows you to <strong>search for bioRxiv preprints in your own language</strong>, using Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
+          <p>PanLingua allows you to <strong>search in your own language for <a href="https://biorxiv.org" target="_blank">bioRxiv</a> preprints</strong>. It uses Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. There is no affiliation between PanLingua and bioRxiv.<br>
+          Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
       </div>
       <div class="row">
@@ -114,7 +115,7 @@
       <div class="row" id="fineprint" style="display:none">
         <div class="col-sm-8">
           <h2>Privacy</h2>
-          <p>We do not store the contents of any query.
+          <p>We do not store the contents of any query; all translation is handled by Google.
           % if config['recaptcha_public'] is not None:
             PanLingua uses Google's reCAPTCHA v3 service to fight spam and abuse of the service.
           % end
@@ -126,13 +127,11 @@
             uses Google Analytics (with all advertising features disabled) to better understand how visitors use our site.
           % end
           % if config['google_analytics_tag'] is not None or config['recaptcha_public'] is not None:
-            % if config['google_analytics_tag'] is not None and config['recaptcha_public'] is not None:
-              In both cases, the
-            % else:
-              The
-            % end
-            Google <a href="https://policies.google.com/privacy">privacy policy</a> and <a href="https://policies.google.com/terms">terms of service</a> apply.
+            In all cases, the
+          % else:
+            The
           % end
+          Google <a href="https://policies.google.com/privacy">privacy policy</a> and <a href="https://policies.google.com/terms">terms of service</a> apply.
         </div>
       </div>
     </div>
