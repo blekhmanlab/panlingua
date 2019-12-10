@@ -25,34 +25,51 @@ for x in LANGDATA:
 def index():
     """The application homepage.
 
-    It responds to empty requests by returning the homepage (the app's
-    only page), populated with the list of languages and prompting the
-    user for a search query. The form submits to the same URL. If a
-    request comes in with a query attached, the app translates the query
-    into English and redirects the user directly to a bioRxiv search page.
+    Returns the homepage (the app's only page), populated with the
+    list of languages and prompting the user for a search query. The
+    form submits to the same URL.
 
-    Inputs are all pulled from the bottle.request.query object:
+    Inputs are all pulled from the bottle.request.query object. This
+    will probably never actually be used, but it would allow someone
+    to link to a search form that's filled in ahead of time:
     - q: The search string entered by the user
     - lang: An "alpha-2" abbreviation (ISO 3166) of the source language
         selected by the user
+    """
+    query = bottle.request.query.q
+    lang = bottle.request.query.lang
+    if lang == "": # default to spanish
+        lang = "es"
+    return bottle.template('index', lang=lang, q=query, languages=LANGUAGES, error=None, config=config.to_display)
+
+@bottle.post('/')
+def search():
+    """Processes POST requests to the homepage
+
+    Translates the query into English and redirects the user directly
+    to a bioRxiv search page.
+
+    Inputs are all pulled from the POSTed form:
+    - q: The search string entered by the user
+    - lang: An "alpha-2" abbreviation (ISO 3166) of the source language
+        selected by the user
+    - recaptcha_response: A token obtained by the reCAPTCHA service when
+        the form is loaded. Designed to prevent automated submissions.
     """
     query = bottle.request.forms.get('q')
     lang = bottle.request.forms.get('lang')
     recaptcha = bottle.request.forms.get('recaptcha_response')
     print(f'|{recaptcha}|')
     print('---')
-    error = (None, None)
-    if lang == "": # default to spanish
-        lang = "es"
-    if query is None:
-        return bottle.template('index', lang=lang, q=query, languages=LANGUAGES, error=None, config=config.to_display)
-    if len(query) > 100:
-        raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.")
+    if lang is None or query is None:
+        raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.")
         # It's tempting to translate errors into the language specified by the
         # user, but that could allow a malicious user to trick us into sending
         # lots of calls to Google without bothering to form a legitimate query
     if lang not in LANGUAGES.keys():
         raise bottle.HTTPError(status=400, body="Unrecognized language specified")
+    if len(query) > 100:
+        raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.")
 
     resp = GOOGLE.translate(query, source_language=lang)
     return bottle.redirect(f"https://translate.google.com/translate?sl=en&tl={lang}&u=https%3A%2F%2Fwww.biorxiv.org%2Fsearch%2F{resp['translatedText']}", 303)
