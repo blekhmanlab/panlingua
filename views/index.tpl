@@ -23,7 +23,6 @@
               recaptchaResponse.value = token;
             });
           }
-          //grecaptcha.ready();
         </script>
       % end
       <script>

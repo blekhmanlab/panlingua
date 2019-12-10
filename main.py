@@ -63,6 +63,9 @@ def search():
     # validate the recaptcha
     if config.recaptcha_private is not None:
         recaptcha = bottle.request.forms.get('recaptcha_response')
+        if recaptcha in ['', None]:
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (no reCAPTCHA data).")
+
         body = {
             'secret': config.recaptcha_private,
             'response': recaptcha,
@@ -89,7 +92,6 @@ def search():
         raise bottle.HTTPError(status=400, body="Unrecognized language specified")
     if len(query) > 100:
         raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.")
-
     resp = GOOGLE.translate(query, source_language=lang)
     return bottle.redirect(f"https://translate.google.com/translate?sl=en&tl={lang}&u=https%3A%2F%2Fwww.biorxiv.org%2Fsearch%2F{resp['translatedText']}", 303)
 
@@ -98,6 +100,9 @@ def error400(error):
     return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
 @bottle.error(404)
 def error404(error):
+    return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
+@bottle.error(500)
+def error500(error):
     return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
 
 # Search engine stuff
@@ -113,4 +118,7 @@ def favicon():
 def callback(path):
     return bottle.static_file(path, root='./static/')
 
-bottle.run(host='0.0.0.0', port=80, debug=True, reloader=True)
+if config.prod:
+  bottle.run(host='0.0.0.0', port=80, server="gunicorn")
+else:
+  bottle.run(host='0.0.0.0', port=80, debug=True, reloader=True)
