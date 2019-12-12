@@ -64,7 +64,9 @@
         }
       </style>
 
-    <title>PanLingua</title>
+    <title>PanLingua: Use your own language to search for preprints</title>
+    <meta name="description" content="{{ content.text['en']['description'] }}">
+
   </head>
   <body>
     <div class="container" id="main">
