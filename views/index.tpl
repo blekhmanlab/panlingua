@@ -61,10 +61,11 @@
       <div class="row">
         <div class="col-md-6">
           <h1><strong>Pan<i><font color="red">L</font></i>ingua</strong></h1>
-          <h4>A multilingual preprint search tool</h2>
+          <h4><span id="subtitle"></span></h2>
         </div>
         <div class="col-md-6">
-          <p>PanLingua allows you to <strong>search in your own language for <a href="https://biorxiv.org" target="_blank">bioRxiv</a> preprints</strong>. It uses Google Translate to provide machine-generated translations of your query, the results and the full text of the preprints. There is no affiliation between PanLingua and bioRxiv.<br>
+          <p><span id="description"></span>
+          There is no affiliation between PanLingua and <a href="https://biorxiv.org" target="_blank">bioRxiv</a>.<br>
           Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
       </div>
@@ -76,17 +77,17 @@
         % end
       </div>
       <div id="jsWarning">
-        <strong>JavaScript is required for this page to function properly.</strong>
+        <strong><span id="jswarning">JavaScript required</span></strong>
       </div>
-      <form action="/" id="searchform" method="post" onsubmit="return get_recaptcha()" style="display:none">
+      <form action="/" id="searchform" method="post" target="_blank" onsubmit="return get_recaptcha()" style="display:none">
         <div class="form-row align-items-center">
           <div class="col-auto">
-              <label class="sr-only" for="q">Search term</label>
-              <input type="text" class="form-control form-control-lg" id="q" name="q" maxlength="100" placeholder="Enter a search term here" value="{{q}}" autofocus>
+              <label class="sr-only" for="q"><span id="search_label"></span></label>
+              <input type="text" class="form-control form-control-lg" id="q" name="q" maxlength="100" placeholder="Search" value="{{q}}" autofocus>
           </div>
           <div class="col-auto">
-            <label class="sr-only" for="lang">Language</label>
-            <select class="form-control-lg" name="lang">
+            <label class="sr-only" for="lang"><span id="language_label"></span></label>
+            <select class="form-control-lg" name="lang" id="lang" onchange="translate_page()">
               % for code, name in languages.items():
                 <option value="{{code}}"
                 %if lang == code:
@@ -109,29 +110,14 @@
       </form>
       <div class="row">
         <div class="col-sm-12" style="text-align: right;">
-          <a href="https://github.com/rabdill/panlingua">Source code</a> | <a href="#" onclick="toggle_privacy();">Privacy</a>
+          <a href="https://github.com/rabdill/panlingua"><span id="source_link"></span></a> | <a href="#" onclick="toggle_privacy();"><span id="privacy_toggle"></span></a>
         </div>
       </div>
       <div class="row" id="fineprint" style="display:none">
         <div class="col-sm-8">
-          <h2>Privacy</h2>
-          <p>We do not store the contents of any query; all translation is handled by Google.
-          % if config['recaptcha_public'] is not None:
-            PanLingua uses Google's reCAPTCHA v3 service to fight spam and abuse of the service.
-          % end
-          % if config['google_analytics_tag'] is not None:
-            It
-            % if config['recaptcha_public'] is not None:
-              also
-            % end
-            uses Google Analytics (with all advertising features disabled) to better understand how visitors use our site.
-          % end
-          % if config['google_analytics_tag'] is not None or config['recaptcha_public'] is not None:
-            In all cases, the
-          % else:
-            The
-          % end
-          Google <a href="https://policies.google.com/privacy">privacy policy</a> and <a href="https://policies.google.com/terms">terms of service</a> apply.
+          <h2 id="privacy_header"></h2>
+
+          <p><span id="privacy_text"></span> The Google <a href="https://policies.google.com/privacy">privacy policy</a> and <a href="https://policies.google.com/terms">terms of service</a> apply.
         </div>
       </div>
     </div>
@@ -140,6 +126,33 @@
       // Make sure users have JS working so we can use reCAPTCHA
       document.getElementById('jsWarning').style.display = "none";
       document.getElementById('searchform').style.display = "block";
+    </script>
+    <script>
+      translate_page = function(lang) {
+        if(lang==undefined) {
+          lang = document.getElementById('lang').value;
+        }
+        console.log("Translating page into " + lang)
+
+        // make the URL reflect the current language
+        window.history.pushState(null, null, window.location.origin+"/?lang="+lang);
+
+        for(var entry in text[lang]) {
+          document.getElementById(entry).innerHTML = text[lang][entry];
+        }
+        // translate the text box:
+        document.getElementById('q').placeholder = text[lang]['search_label'];
+      }
+      text = {}
+      % for lang in content.text.keys():
+        text['{{ lang }}'] = {
+        % for entry, translation in content.text[lang].items():
+          '{{ entry}}': "{{ translation }}",
+        % end
+        };
+      % end
+
+      translate_page();
     </script>
   </body>
 </html>

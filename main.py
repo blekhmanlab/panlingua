@@ -4,11 +4,13 @@ On startup, the application fetches a list of currently supported
 languages from the Google Cloud Translate API.
 """
 import json
+import os.path
 import sys
 import bottle
 from google.cloud import translate_v2 as translate
 import requests
 import config
+import content
 
 # phone google to get a list of available languages
 GOOGLE = translate.Client()
@@ -20,6 +22,31 @@ if len(LANGDATA) < 50:
 
 for x in LANGDATA:
     LANGUAGES[x['language']] = x['name']
+
+# The app stores a translated version of its homepage, and updates the page
+# to reflect the language selected by the user.
+do_translate = True
+if os.path.exists('translations.json'):
+    with open('translations.json','r') as f:
+        print('Pulling translations from file!')
+        content.text = json.load(f)
+        do_translate = False
+    if len(content.text.keys()) < 50:
+        print('Data in translations file looks funny. Re-translating.')
+        do_translate = True
+if do_translate:
+    # translate all the content into languages
+    for lang in LANGUAGES.keys():
+        if lang == 'en': continue
+        print(f"Translating text into {lang}")
+        content.text[lang] = {}
+        for entry, text in content.text['en'].items():
+            resp = GOOGLE.translate(text, source_language='en', target_language=lang)
+            content.text[lang][entry] = resp['translatedText']
+
+    with open('translations.json','w') as f:
+        print("RECORDING!")
+        json.dump(content.text, f)
 
 # - ROUTES -
 @bottle.get('/')
@@ -39,9 +66,9 @@ def index():
     """
     query = bottle.request.query.q
     lang = bottle.request.query.lang
-    if lang == "": # default to spanish
-        lang = "es"
-    return bottle.template('index', lang=lang, q=query, languages=LANGUAGES, error=None, config=config.to_display)
+    if lang == "":
+        lang = "en"
+    return bottle.template('index', lang=lang, q=query, languages=LANGUAGES, content=content, error=None, config=config.to_display)
 
 @bottle.post('/')
 def search():
@@ -97,13 +124,13 @@ def search():
 
 @bottle.error(400)
 def error400(error):
-    return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
+    return bottle.template('index', lang="es", q="", languages=LANGUAGES, content=content, config=config.to_display, error=error.body)
 @bottle.error(404)
 def error404(error):
-    return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
+    return bottle.template('index', lang="es", q="", languages=LANGUAGES, content=content, config=config.to_display, error=error.body)
 @bottle.error(500)
 def error500(error):
-    return bottle.template('index', lang="es", q="", languages=LANGUAGES, config=config.to_display, error=error.body)
+    return bottle.template('index', lang="es", q="", languages=LANGUAGES, content=content, config=config.to_display, error=error.body)
 
 # Search engine stuff
 @bottle.route('/robots.txt')
