@@ -1,6 +1,6 @@
 # PanLingua
 
-PanLingua is a simple shortcut to searching for preprints on bioRxiv.org using non-English search terms. Most of the work is done by Google and bioRxiv:
+PanLingua is a simple shortcut to searching for preprints on bioRxiv.org using non-English search terms, intended to streamline access to preprints for readers who speak any of the 104 languages currently supported by Google Translate. Most of the work is done by Google and bioRxiv:
 
 1. A user arrives at panlingua.rxivist.org. They are presented with a search box and a list of languages supported by the Google Cloud Translate API.
 1. The user inputs a search term in their chosen language and submits the form.
@@ -9,7 +9,7 @@ PanLingua is a simple shortcut to searching for preprints on bioRxiv.org using n
 1. The generated bioRxiv URL is passed to translate.google.com, which provides a translated version of that page in whatever language was originally selected by the user.
 1. The user is redirected to the translate.google.com page with the search results.
 
-## Contact:
+## Contact
 
 * Humberto Debat, research scientist, Instituto Nacional de Tecnología Agropecuaria (IPAVE-CIAP-INTA)
   * debat.humberto *at* inta.gob.ar
