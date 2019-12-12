@@ -27,7 +27,17 @@
         </script>
       % end
       <script>
-        toggle_privacy = function() {
+        function form_submit() {
+          % if config['google_analytics_tag'] is not None:
+            var selected_language = document.getElementById('lang');
+            ga('send', 'event', 'Translation', 'Submit', selected_language.value);
+          % end
+          % if config['recaptcha_public'] is not None:
+            get_recaptcha()
+          % end
+          return true
+        }
+        function toggle_privacy() {
           var fineprint = document.getElementById('fineprint');
           if(fineprint.style.display == "none") fineprint.style.display = "block";
           else fineprint.style.display = "none";
@@ -79,7 +89,7 @@
       <div id="jsWarning">
         <strong><span id="jswarning">JavaScript required</span></strong>
       </div>
-      <form action="/" id="searchform" method="post" onsubmit="return get_recaptcha()" style="display:none">
+      <form action="/" id="searchform" method="post" onsubmit="return form_submit()" style="display:none">
         <div class="form-row align-items-center">
           <div class="col-auto">
               <label class="sr-only" for="q"><span id="search_label"></span></label>
