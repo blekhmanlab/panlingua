@@ -87,11 +87,13 @@ def search():
     query = bottle.request.forms.getunicode('q')
     lang = bottle.request.forms.get('lang')
 
+    traceback = {'query':query, 'lang':lang}
+
     # validate the recaptcha
     if config.recaptcha_private is not None:
         recaptcha = bottle.request.forms.get('recaptcha_response')
         if recaptcha in ['', None]:
-            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (no reCAPTCHA data).")
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (no reCAPTCHA data).", traceback=traceback)
 
         body = {
             'secret': config.recaptcha_private,
@@ -100,31 +102,35 @@ def search():
         }
         resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=body)
         if resp.status_code != 200:
-            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (error returned from Google).")
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (error returned from Google).", traceback=traceback)
         try:
             validate = resp.json()
         except:
-            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (unable to decode Google response).")
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request (unable to decode Google response).", traceback=traceback)
         if 'success' not in validate.keys():
-            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request.")
+            raise bottle.HTTPError(status=500, body="Unable to validate authenticity of request.", traceback=traceback)
         if not validate['success']:
-            raise bottle.HTTPError(status=400, body="Request flagged as suspicious, sorry.")
+            raise bottle.HTTPError(status=400, body="Request flagged as suspicious, sorry.", traceback=traceback)
 
-    if lang in [None, ''] or query in [None, '']:
-        raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.")
-        # NOTE: It's tempting to translate errors into the language specified by the
-        # user, but that could allow a malicious user to trick us into sending
-        # lots of calls to Google without bothering to form a legitimate query
+    if query in [None, '']:
+        raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.", traceback=traceback)
+    if lang in [None, '']:
+        traceback['lang'] = 'es' # default to spanish if something weird happens
+        raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.", traceback=traceback)
     if lang not in LANGUAGES.keys():
-        raise bottle.HTTPError(status=400, body="Unrecognized language specified")
+        traceback['lang'] = 'es'
+        raise bottle.HTTPError(status=400, body="Unrecognized language specified", traceback=traceback) # default to spanish
+    if lang == 'en':
+        raise bottle.HTTPError(status=400, body="English translation is not supported; use biorxiv.org search directly you silly billy", traceback=traceback)
     if len(query) > 100:
-        raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.")
+        raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.", traceback=traceback)
     resp = GOOGLE.translate(query, source_language=lang)
     return bottle.redirect(f"https://translate.google.com/translate?sl=en&tl={lang}&u=https%3A%2F%2Fwww.biorxiv.org%2Fsearch%2F{resp['translatedText']}", 303)
 
 @bottle.error(400)
 def error400(error):
-    return bottle.template('index', lang="es", q="", languages=LANGUAGES, content=content, config=config.to_display, error=error.body)
+    print(error)
+    return bottle.template('index', lang=error.traceback['lang'], q="", languages=LANGUAGES, content=content, config=config.to_display, error=error.body)
 @bottle.error(404)
 def error404(error):
     return bottle.template('index', lang="es", q="", languages=LANGUAGES, content=content, config=config.to_display, error=error.body)
