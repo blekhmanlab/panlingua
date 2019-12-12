@@ -79,7 +79,7 @@
       <div id="jsWarning">
         <strong><span id="jswarning">JavaScript required</span></strong>
       </div>
-      <form action="/" id="searchform" method="post" target="_blank" onsubmit="return get_recaptcha()" style="display:none">
+      <form action="/" id="searchform" method="post" onsubmit="return get_recaptcha()" style="display:none">
         <div class="form-row align-items-center">
           <div class="col-auto">
               <label class="sr-only" for="q"><span id="search_label"></span></label>

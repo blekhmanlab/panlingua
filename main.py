@@ -84,7 +84,7 @@ def search():
     - recaptcha_response: A token obtained by the reCAPTCHA service when
         the form is loaded. Designed to prevent automated submissions.
     """
-    query = bottle.request.forms.get('q')
+    query = bottle.request.forms.getunicode('q')
     lang = bottle.request.forms.get('lang')
 
     # validate the recaptcha
@@ -110,7 +110,7 @@ def search():
         if not validate['success']:
             raise bottle.HTTPError(status=400, body="Request flagged as suspicious, sorry.")
 
-    if lang is None or query is None:
+    if lang in [None, ''] or query in [None, '']:
         raise bottle.HTTPError(status=400, body="Request must specify a query and a source language.")
         # NOTE: It's tempting to translate errors into the language specified by the
         # user, but that could allow a malicious user to trick us into sending
