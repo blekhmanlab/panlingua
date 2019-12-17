@@ -30,12 +30,12 @@
         function form_submit() {
           % if config['google_analytics_tag'] is not None:
             var selected_language = document.getElementById('lang');
-            ga('send', 'event', 'Translation', 'Submit', selected_language.value);
+            a=ga('send', 'event', 'Translation', 'Submit', selected_language.value);
           % end
           % if config['recaptcha_public'] is not None:
             get_recaptcha()
           % end
-          return true
+          return false
         }
         function toggle_privacy() {
           var fineprint = document.getElementById('fineprint');
@@ -45,24 +45,8 @@
       </script>
 
       <link rel="stylesheet" href="/static/bootstrap.min.css">
-      <style>
-        body {
-          background-color: #a1a1a1;
-        }
-        h1,h2,h3,h4 {
-          font-family: Georgia;
-        }
-        #main {
-          background-color: #fff;
-          border-radius: 20px;
-          padding: 15px;
-          padding-top: 20px;
-          margin-top: 10%;
-        }
-        a:hover {
-          text-decoration: none;
-        }
-      </style>
+      <link rel="stylesheet" href="https://rxivist.org/static/rxivist.css">
+      <link rel="stylesheet" href="/static/panlingua.css">
 
     <title>PanLingua: Use your own language to search for preprints</title>
     <meta name="description" content="{{ content.text['en']['description'] }}">
@@ -71,16 +55,24 @@
   <body>
     <div class="container" id="main">
       <div class="row">
-        <div class="col-md-6">
-          <h1><strong>Pan<i><font color="red">L</font></i>ingua</strong></h1>
-          <h4><span id="subtitle"></span></h2>
+        <div class="col-md-4">
+          <h1><strong>Pan<i class="fancyl">L</i>ingua</strong></h1>
+          <h4><span id="subtitle">A multilingual pre-print search tool</span></h2>
+          <p><em><span id="affiliation" class="fancyl">Part of the Rxivist project</span></em>
         </div>
-        <div class="col-md-6">
-          <p><span id="description"></span>
-          There is no affiliation between PanLingua and <a href="https://biorxiv.org" target="_blank">bioRxiv</a>.<br>
+        <div class="col-md-4">
+          <p><span id="description">PanLingua enables you to search in your own language for pre-prints on bioRxiv.org. It uses Google Translate to provide machine-generated translations of your query and the manuscripts.</span>
           Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
+        <div class="col-md-4">
+          <ul style="padding-left: 5px;">
+            <li><a href="https://rxivist.org"><img src="/static/rxivist_logo_cropped.png" style="height: 20px;">: <span id="rxivist_link">search popular pre-prints</span></a>
+            <li><a href="https://github.com/blekhmanlab/panlingua"><span id="source_link"></span></a>
+            <li><a href="mailto://rxivist@umn.edu"><span id="contact_link">E-mail contact</span></a>
+            <li><a href="#" onclick="toggle_privacy();"><span id="privacy_toggle"></span></a>
+        </div>
       </div>
+
       <div class="row">
         % if error is not None:
           <div class="col-sm-12 alert alert-danger" role="alert">
@@ -92,37 +84,34 @@
         <strong><span id="jswarning">JavaScript required</span></strong>
       </div>
       <form action="/" id="searchform" method="post" onsubmit="return form_submit()" style="display:none">
-        <div class="form-row align-items-center">
-          <div class="col-auto">
-              <label class="sr-only" for="q"><span id="search_label"></span></label>
-              <input type="text" class="form-control form-control-lg" id="q" name="q" maxlength="100" placeholder="Search" value="{{q}}" autofocus>
-          </div>
-          <div class="col-auto">
-            <label class="sr-only" for="lang"><span id="language_label"></span></label>
-            <select class="form-control-lg" name="lang" id="lang" onchange="translate_page()">
-              % for code, name in languages.items():
-                <option value="{{code}}"
-                %if lang == code:
-                  selected
-                %end
-                >{{name}}</option>
-              % end
-            </select>
-          </div>
+        <div class="input-group mb-3">
+          <label class="sr-only" for="q"><span id="search_label"></span></label>
+          <input type="text" class="form-control form-control-lg" id="q" name="q" maxlength="100" placeholder="Search" value="{{q}}" autofocus>
+
+          <!-- for fixing responsiveness of input group -->
+          <div class="d-md-none w-100"></div>
+
+          <label class="sr-only" for="lang"><span id="language_label"></span></label>
+          <select class="form-control-lg" name="lang" id="lang" onchange="translate_page()">
+            % for code, name in languages.items():
+              <option value="{{code}}"
+              %if lang == code:
+                selected
+              %end
+              >{{name}}</option>
+            % end
+          </select>
           <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
-          <div class="col-auto">
-            <button type="submit" class="btn btn-lg" style="background-color:red"><strong>Search</strong></button>
+          <div class="d-md-none w-100"></div>
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-altcolor">Search</button>
           </div>
         </div>
-        <div class="form-row align-items-center">
-          <div class="col-sm-3 offset-sm-1">
-            <a href="https://translate.google.com" target="_blank"><img src="/static/google_translate.png" style="width: 200px;"></a>
-          </div>
-        </div>
+
       </form>
       <div class="row">
-        <div class="col-sm-12" style="text-align: right;">
-          <a href="https://github.com/rabdill/panlingua"><span id="source_link"></span></a> | <a href="#" onclick="toggle_privacy();"><span id="privacy_toggle"></span></a>
+        <div class="col-sm-2 offset-sm-1" style="margin-top: -10px;">
+          <a href="https://translate.google.com" target="_blank"><img src="/static/google_translate.png" style="width: 200px;"></a>
         </div>
       </div>
       <div class="row" id="fineprint" style="display:none">
