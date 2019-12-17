@@ -11,7 +11,7 @@ text = {
         'privacy_toggle': 'Privacy',
         'privacy_header': 'Privacy',
         'source_link': 'Source code',
-        'rxivist_link': 'search popular pre-prints',
+        'rxivist_link': 'Search popular pre-prints',
         'contact_link': 'E-mail contact',
         'privacy_text': "We do not store the text of any query. All translation is performed by Google. PanLingua also uses Google's reCAPTCHA v3 service to fight spam and abuse of the service, and Google Analytics (with all advertising features disabled) to better understand how visitors use our site. There is no affiliation between PanLingua and bioRxiv.org."
     }

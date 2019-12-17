@@ -35,7 +35,7 @@
           % if config['recaptcha_public'] is not None:
             get_recaptcha()
           % end
-          return false
+          return true
         }
         function toggle_privacy() {
           var fineprint = document.getElementById('fineprint');
@@ -65,8 +65,12 @@
           Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
         <div class="col-md-4">
-          <ul style="padding-left: 5px;">
-            <li><a href="https://rxivist.org"><img src="/static/rxivist_logo_cropped.png" style="height: 20px;">: <span id="rxivist_link">search popular pre-prints</span></a>
+          <a href="https://rxivist.org"><img src="/static/rxivist_logo_cropped.png" style="height: 25px; margin-left: -15px;">
+          <ul>
+            <li><span id="rxivist_link">Search popular pre-prints</span></a>
+          </ul>
+          <hr>
+          <ul>
             <li><a href="https://github.com/blekhmanlab/panlingua"><span id="source_link"></span></a>
             <li><a href="mailto://rxivist@umn.edu"><span id="contact_link">E-mail contact</span></a>
             <li><a href="#" onclick="toggle_privacy();"><span id="privacy_toggle"></span></a>
