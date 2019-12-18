@@ -121,7 +121,7 @@ def search():
         traceback['lang'] = 'es'
         raise bottle.HTTPError(status=400, body="Unrecognized language specified", traceback=traceback) # default to spanish
     if lang == 'en':
-        raise bottle.HTTPError(status=400, body="English translation is not supported; use biorxiv.org search directly you silly billy", traceback=traceback)
+        raise bottle.HTTPError(status=400, body="English translation is not supported; use biorxiv.org search directly.", traceback=traceback)
     if len(query) > 100:
         raise bottle.HTTPError(status=400, body="The query is too long. Limit is 100 letters.", traceback=traceback)
     resp = GOOGLE.translate(query, source_language=lang)

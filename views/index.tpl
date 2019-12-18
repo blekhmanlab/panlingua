@@ -55,7 +55,7 @@
   <body>
     <div class="container" id="main">
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-5">
           <h1><strong>Pan<i class="fancyl">L</i>ingua</strong></h1>
           <h4><span id="subtitle">A multilingual pre-print search tool</span></h2>
           <p><em><span id="affiliation" class="fancyl">Part of the Rxivist project</span></em>
@@ -64,7 +64,7 @@
           <p><span id="description">PanLingua enables you to search in your own language for pre-prints on bioRxiv.org. It uses Google Translate to provide machine-generated translations of your query and the manuscripts.</span>
           Concept by <a href="https://twitter.com/humbertodebat" target="_blank">Humberto Debat</a>, code by <a href="https://twitter.com/richabdill" target="_blank">Rich Abdill</a>.
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <a href="https://rxivist.org"><img src="/static/rxivist_logo_cropped.png" style="height: 25px; margin-left: -15px;">
           <ul>
             <li><span id="rxivist_link">Search popular pre-prints</span></a>
