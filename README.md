@@ -1,3 +1,13 @@
+**Note, March 2023: The Rxivist project has been discontinued.** This code will remain available indefinitely, but we can't make any assurances about its functionality going forward as dependencies and external data sources change.
+
+.
+
+.
+
+.
+
+.
+
 # PanLingua
 
 PanLingua is a simple shortcut to searching for preprints on bioRxiv.org using non-English search terms, intended to streamline access to preprints for readers who speak any of the 104 languages currently supported by Google Translate. Most of the work is done by Google and bioRxiv:
